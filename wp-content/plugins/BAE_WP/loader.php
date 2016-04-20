@@ -15,10 +15,22 @@ class BAE_Base {
 		 if(!($query=$db->query("SELECT * FROM ".get_class($this)." Where ".$field."=".$id))){
 			echo "Error creating ".get_class($this).": ".$db->connect_errno;
 		 }
+		 //can handle objects made up of one or more rows of data
 		 else {
-			$result=mysqli_fetch_array($query);
-			for each($result as $key=>$value){
-				eval("$this->".$key."=".$value); //needs sanitizing
+			 $i=0;
+			 if($result->num_rows!=1){
+				 while($row = $result->fetch_assoc()){
+					for each($row as $key=>$value){
+						eval("$this->".$key[$i]."=".$value); //needs sanitizing
+					}
+					$i++;
+				}
+			 }
+			else {
+				$row = $result->fetch_assoc();
+				for each($row as $key=>$value){
+						eval("$this->".$key."=".$value); //needs sanitizing
+					}
 			}
 		 }
 		return $this;
