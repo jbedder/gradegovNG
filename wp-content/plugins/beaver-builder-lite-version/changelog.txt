@@ -1,3 +1,69 @@
+<h4>1.7.8 - 04/20/2016</h4>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+	<li>Fixed a bug in the Post Carousel and Post Slider modules caused in 1.7.7 that broke the offset setting.</li>
+</ul>
+
+<h4>1.7.7 - 04/19/2016</h4>
+<p><strong>Enhancements</strong></p>
+<ul>
+	<li>Added support for HTML in the Number Counter module.</li>
+	<li>Added a loop setting to the Content Slider module to toggle looping so sliders with a single slide can't be swiped on mobile.</li>
+	<li>Added fl_builder_loop_taxonomies filter.</li>
+	<li>Upgrade links in the lite version now open in a new window.</li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+	<li>Fixed a bug with Japanese characters breaking nested forms.</li>
+	<li>Fixed a PHP warning caused by font fields.</li>
+	<li>Fixed a backwards compatibility issue with the Tesseract theme caused in the 1.7.6 update.</li>
+	<li>Fixed a fatal error when uninstalling via Settings > Page Builder > Uninstall.</li>
+	<li>Fixed a bug in the Post Carousel and Post Slider modules preventing slides from showing when pagination parameters are present.</li>
+	<li>Fixed a bug in the Menu module causing the page to scroll horizontally.</li>
+	<li>Fixed a bug with images in templates disappearing in nested forms when no image is selected.</li>
+	<li>Fixed a bug with the media library not working in certain themes in WordPress 4.5.</li>
+</ul>
+
+<h4>1.7.6 - 03/29/2016</h4>
+<p><strong>Enhancements</strong></p>
+<ul>
+	<li>Optimized database calls for global rows and modules.</li>
+	<li>URLs in the builder's CSS cache are now saved as HTTPS if the site has SSL enabled.</li>
+	<li>Font Awesome and Foundation icon files are now loaded via CDN.</li>
+	<li>The "Publish Changes" button in the builder now says "Submit for Review" for drafts when a user doesn't have the capability to publish.</li>
+	<li>Changed the error message in the Subscribe Form module to mention tags instead of lists for Drip and Hatchbuck.</li>
+	<li>Added responsive alignment settings to the Icon module. Props to Ben on his first Beaver Builder commit! :)</li>
+	<li>Added the option to have uncropped photos in the Posts Carousel and Posts Slider modules.</li>
+	<li>Added the fl_builder_loop_query_args filter for filtering query args in the FLBuilderLoop class.</li>
+	<li>Added the fl_builder_posts_module_layout_path filter for filtering the path of layout files in the Posts module.</li>
+	<li>Added the fl_builder_color_presets filter for adding color presets to the builder's color picker.</li>
+	<li>Added the fl_builder_after_render_css and fl_builder_after_render_js actions for hooking into after assets are rendered.</li>
+	<li>Added the "remove" method for modules that is only called when they are removed from the page.</li>
+	<li>Exposed bxSlider object in the Posts Carousel and Posts Slider modules so it can be accessed by third party code.</li>
+	<li>Updated bxSlider.</li>
+	<li>Updated translations.</li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+	<li>Fixed styling issues with the column settings dropdown in certain themes.</li>
+	<li>Fixed styling issues with column resize handles and global rows and modules.</li>
+	<li>Fixed styling issues with IE11 and full-height rows.</li>
+	<li>Fixed styling issues with the Heading module.</li>
+	<li>Fixed styling issues with the Callout module.</li>
+	<li>Fixed styling issues with the Content Slider module.</li>
+	<li>Fixed a bug with icon fields in nested forms throwing warnings.</li>
+	<li>Fixed a bug with the color picker breaking when the core WordPress color picker scripts are loaded.</li>
+	<li>Fixed a bug with modules set to animate below a slideshow would animate immediately.</li>
+	<li>Fixed a bug with smooth scrolling links having the same ID on two different pages.</li>
+	<li>Fixed a bug with sub-menus going off the right side of the page in the Menu module.</li>
+	<li>Fixed a bug with module classes being serialized in saved layout data when a row is copied.</li>
+	<li>Fixed a bug with mixed double quotes breaking the JS for the FLBuilder::render_query method.</li>
+	<li>Fixed a bug caused by the WPide plugin.</li>
+	<li>Fixed a select field bug where the value of the 'selected' function was being echoed instead of returned.</li>
+	<li>Fixed a bug with the Google Plus button not working in the Slideshow module.</li>
+	<li>Fixed a bug with wbr tags breaking nested forms.</li>
+</ul>
+
 <h4>1.7.5 - 02/24/2016</h4>
 <p><strong>Bug Fixes</strong></p>
 <ul>

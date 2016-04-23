@@ -42,9 +42,9 @@
                     return '<a class="moretag" href="' . $permalink . '"> ' . $more_text . '</a>';
                 }, 99 ); 
                 ?>
-                <?  the_excerpt(); ?> 
+                <?php  the_excerpt(); ?> 
                  
-            <? }else{
+            <?php }else{
                 
                 the_content();
                 

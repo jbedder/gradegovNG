@@ -102,7 +102,7 @@
 			</div>
 			<div class="fl-clear"></div>
 		</div>
-		<?php if ( ! $simple_ui ) : ?>
+		<?php if ( ! FLBuilderModel::is_post_user_template( 'module' ) && ! $simple_ui ) : ?>
 		<# if ( ! data.parentFirst ) { #>
 		<div class="fl-block-col-resize fl-block-col-resize-w">
 			<div class="fl-block-col-resize-handle-wrap">

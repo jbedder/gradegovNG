@@ -12,7 +12,7 @@
 		if ( is_array( $value ) && in_array( $option_key, $value ) ) {
 			$selected = ' selected="selected"';
 		}
-		else if ( ! is_array( $value ) && selected( $value, $option_key, true ) ) {
+		else if ( ! is_array( $value ) && selected( $value, $option_key, false ) ) {
 			$selected = ' selected="selected"';
 		}
 		else {

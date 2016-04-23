@@ -328,7 +328,7 @@ final class FLBuilderIcons {
 		$fields = FLBuilderModel::get_settings_form_fields( $form );
 		
 		foreach ( $fields as $name => $field ) {
-			if ( $field['type'] == 'icon' ) {
+			if ( $field['type'] == 'icon' && ! empty( $module->settings->$setting ) ) {
 				foreach ( $module->settings->$setting as $key => $val ) {
 					if ( isset( $val->$name ) ) {
 						self::enqueue_styles_for_icon( $val->$name );

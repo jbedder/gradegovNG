@@ -87,7 +87,7 @@
 		{
 			var links  = $('.fl-settings-nav a'),
 				hash   = window.location.hash,
-				active = hash === '' ? [] : links.filter('[href~='+ hash +']');
+				active = hash === '' ? [] : links.filter('[href~="'+ hash +'"]');
 				
 			$('a.fl-active').removeClass('fl-active');
 			$('.fl-settings-form').hide();
@@ -343,7 +343,7 @@
 		 */
 		_uninstallFormSubmit: function()
 		{
-			var result = prompt(FLBuilderAdminSettingsStrings.uninstall, '');
+			var result = prompt(FLBuilderAdminSettingsStrings.uninstall.replace(/&quot;/g, '"'), '');
 			
 			if(result == 'uninstall') {
 				return true;

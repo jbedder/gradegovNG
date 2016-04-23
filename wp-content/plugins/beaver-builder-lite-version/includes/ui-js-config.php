@@ -13,10 +13,12 @@ var FLBuilderConfig = {
 	lite: <?php if(FL_BUILDER_LITE === true) echo 'true'; else echo 'false'; ?>,
 	newUser: <?php if ( FLBuilderModel::is_new_user() ) echo 'true'; else echo 'false'; ?>,
 	postId: <?php echo $post_id; ?>,
+	postStatus: '<?php echo get_post_status(); ?>',
 	postType: '<?php echo get_post_type(); ?>',
 	simpleUi: <?php if(!FLBuilderModel::current_user_has_editing_capability()) echo 'true'; else echo 'false'; ?>,
 	upgradeUrl: '<?php if(FL_BUILDER_LITE === true) $campaign = 'upgrade-button'; else $campaign = 'buy-button'; echo FLBuilderModel::get_upgrade_url( array( 'utm_source' => 'external', 'utm_medium' => 'builder', 'utm_campaign' => $campaign ) ); ?>',
 	userCanEditGlobalTemplates: <?php if(current_user_can(FLBuilderModel::get_global_templates_editing_capability())) echo 'true'; else echo 'false'; ?>,
+	userCanPublish: <?php if(current_user_can('publish_posts')) echo 'true'; else echo 'false'; ?>,
 	userTemplateType: '<?php echo FLBuilderModel::get_user_template_type(); ?>'
 };
 
@@ -90,9 +92,11 @@ var FLBuilderStrings = {
 	selectPhoto: '<?php esc_attr_e('Select Photo', 'fl-builder'); ?>',
 	selectPhotos: '<?php esc_attr_e('Select Photos', 'fl-builder'); ?>',
 	selectVideo: '<?php esc_attr_e('Select Video', 'fl-builder'); ?>',
+	submitForReview: '<?php esc_attr_e('Submit for Review', 'fl-builder'); ?>',
 	subscriptionModuleAccountError: '<?php esc_attr_e('Please select an account before saving.', 'fl-builder'); ?>',
 	subscriptionModuleConnectError: '<?php esc_attr_e('Please connect an account before saving.', 'fl-builder'); ?>',
 	subscriptionModuleListError: '<?php esc_attr_e('Please select a list before saving.', 'fl-builder'); ?>',
+	subscriptionModuleTagsError: '<?php esc_attr_e('Please enter at least one tag before saving.', 'fl-builder'); ?>',
 	takeHelpTour: '<?php esc_attr_e('Take a Tour', 'fl-builder'); ?>',
 	templateAppend: '<?php esc_attr_e('Append New Layout', 'fl-builder'); ?>',
 	templateReplace: '<?php esc_attr_e('Replace Existing Layout', 'fl-builder'); ?>',

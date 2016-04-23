@@ -263,10 +263,10 @@ var FLBuilderColorPicker;
 
 	/**
 	 * @since 1.6.4
-	 * @method $.fn.gradient
+	 * @method $.fn.flBuilderColorPickerGradient
 	 * @return {Array}
 	 */
-	$.fn.gradient = function() {
+	$.fn.flBuilderColorPickerGradient = function() {
 		var args = arguments;
 
 		return this.each( function() {
@@ -282,10 +282,10 @@ var FLBuilderColorPicker;
 
 	/**
 	 * @since 1.6.4
-	 * @method $.fn.raninbowGradient
+	 * @method $.fn.flBuilderColorPickerRaninbowGradient
 	 * @return {Array}
 	 */
-	$.fn.raninbowGradient = function( origin, args ) {
+	$.fn.flBuilderColorPickerRaninbowGradient = function( origin, args ) {
 		var opts, template, i, steps;
 
 		origin = origin || 'top';
@@ -300,7 +300,7 @@ var FLBuilderColorPicker;
 		}
 		
 		return this.each(function() {
-			$(this).gradient( origin, steps );
+			$(this).flBuilderColorPickerGradient( origin, steps );
 		});
 	};
 
@@ -929,7 +929,7 @@ var FLBuilderColorPicker;
 						}
 					}
 
-					target.raninbowGradient( origin, stops );
+					target.flBuilderColorPickerRaninbowGradient( origin, stops );
 					break;
 				case 's':
 					if ( mode === 'hsv' ) {
@@ -949,7 +949,7 @@ var FLBuilderColorPicker;
 					}
 
 
-					target.gradient( origin, stops );
+					target.flBuilderColorPickerGradient( origin, stops );
 					break;
 				case 'l':
 					if ( control === 'strip' ) {
@@ -957,7 +957,7 @@ var FLBuilderColorPicker;
 					} else {
 						stops = ['#fff', 'rgba(255,255,255,0) 50%', 'rgba(0,0,0,0) 50%', 'rgba(0,0,0,1)'];
 					}
-					target.gradient( origin, stops );
+					target.flBuilderColorPickerGradient( origin, stops );
 					break;
 				case 'v':
 						if ( control === 'strip' ) {
@@ -965,7 +965,7 @@ var FLBuilderColorPicker;
 						} else {
 							stops = ['rgba(0,0,0,0)', '#000'];
 						}
-						target.gradient( origin, stops );
+						target.flBuilderColorPickerGradient( origin, stops );
 					break;
 				default:
 					break;

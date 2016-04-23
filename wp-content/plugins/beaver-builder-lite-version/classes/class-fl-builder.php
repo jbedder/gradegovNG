@@ -14,6 +14,14 @@ final class FLBuilder {
 	 * @var int $post_rendering
 	 */
 	static public $post_rendering = null;
+	
+	/**
+	 * Stores the default directory name to look for in a theme for BB templates.
+	 *
+	 * @since 1.5.9-cf
+	 * @var string $template_dir
+	 */
+	static private $template_dir = 'fl-builder/includes';
 
 	/**
 	 * Localization
@@ -267,11 +275,13 @@ final class FLBuilder {
 		$js_url  = plugins_url('/js/', FL_BUILDER_FILE);
 
 		// Register additional CSS
-		wp_register_style('font-awesome',           $css_url . 'font-awesome.min.css', array(), $ver);
-		wp_register_style('foundation-icons',       $css_url . 'foundation-icons.css', array(), $ver);
 		wp_register_style('fl-slideshow',           $css_url . 'fl-slideshow.css', array(), $ver);
 		wp_register_style('jquery-bxslider',        $css_url . 'jquery.bxslider.css', array(), $ver);
 		wp_register_style('jquery-magnificpopup',   $css_url . 'jquery.magnificpopup.css', array(), $ver);
+		
+		// Register icon CDN CSS
+		wp_register_style('font-awesome',           'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css', array(), $ver);
+		wp_register_style('foundation-icons',       'https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css', array(), $ver);
 
 		// Register additional JS
 		wp_register_script('fl-slideshow',          $js_url . 'fl-slideshow.js', array('yui3'), $ver, true);
@@ -561,6 +571,33 @@ final class FLBuilder {
 			));
 		}
 	}
+	
+	static public function locate_template_file( $template_base, $slug )
+	{
+		$specific_template = $template_base . '-' . $slug . '.php';
+		$general_template = $template_base . '.php';
+		$default_dir = trailingslashit( FL_BUILDER_DIR ) . 'includes/';
+		
+		// Try to find the specific template, then repeat the same process for general.
+		
+		$locate_template_order = apply_filters( 'fl_builder_locate_template_order', array(
+			self::$template_dir . $specific_template,
+			self::$template_dir . $general_template
+		), self::$template_dir, $template_base, $slug );
+		
+		$template_path = locate_template( $locate_template_order );
+		
+		if ( ! $template_path ) {
+			if ( file_exists( $default_dir . $specific_template ) ) {
+				$template_path = $default_dir . $specific_template;
+			}
+			else if ( file_exists( $default_dir . $general_template ) ) {
+				$template_path = $default_dir . $general_template;
+			}
+		}
+		
+		return apply_filters( 'fl_builder_template_path', $template_path, $template_base, $slug );
+	}
 
 	/**
 	 * Renders the markup for the builder interface.
@@ -781,11 +818,17 @@ final class FLBuilder {
 			
 			// Added stylesheets inline can mess with specificity, so we add them to the head with JS.
 			if ( ! empty( $styles ) ) {
-				echo '<script>jQuery("head").prepend("' . $styles . '");</script>';
+				echo '<script>jQuery("head").prepend("' . str_replace( '"', "'", $styles ) . '");</script>';
 			}
+			
+			// Backup the main query in case it is overwritten in the_content().
+			$backup_query = $wp_query;
 			
 			// Render the content.
 			the_content();
+			
+			// Restore the main query in case it was overwritten.
+			$wp_query = $backup_query;
 		}
 		
 		// Reset the post_id if we have one in $post_data.
@@ -824,10 +867,17 @@ final class FLBuilder {
 			remove_filter( 'the_content', 'FLBuilder::render_content' );
 			
 			// Render the content.
+			
 			ob_start();
+
+			do_action( 'fl_builder_before_render_content', $content );
+
 			echo '<div class="' . self::render_content_classes() . '" data-post-id="' . $post_id . '">';
 			self::render_nodes();
 			echo '</div>';
+			
+			do_action( 'fl_builder_after_render_content', $content );
+			
 			$content = ob_get_clean();
 			
 			// Reapply the builder's render_content filter.
@@ -909,12 +959,16 @@ final class FLBuilder {
 	 */
 	static public function render_nodes()
 	{
+		do_action( 'fl_builder_before_render_nodes' );
+		
 		if ( FLBuilderModel::is_post_user_template( 'module' ) ) {
 			self::render_modules();
 		}
 		else {
 			self::render_rows();
 		}
+		
+		do_action( 'fl_builder_after_render_nodes' );
 	}
 
 	/**
@@ -1324,10 +1378,14 @@ final class FLBuilder {
 	static public function render_rows()
 	{
 		$rows = FLBuilderModel::get_nodes('row');
+		
+		do_action( 'fl_builder_before_render_rows', $rows );
 
 		foreach($rows as $row) {
 			self::render_row($row);
 		}
+		
+		do_action( 'fl_builder_after_render_rows', $rows );
 	}
 
 	/**
@@ -1340,8 +1398,19 @@ final class FLBuilder {
 	static public function render_row($row)
 	{
 		$groups = FLBuilderModel::get_nodes('column-group', $row);
-
-		include FL_BUILDER_DIR . 'includes/row.php';
+		
+		do_action( 'fl_builder_before_render_row', $row, $groups );
+		
+		$template_file = self::locate_template_file(
+			apply_filters( 'fl_builder_row_template_base', 'row', $row ),
+			apply_filters( 'fl_builder_row_template_slug', '', $row )
+		);
+		
+		if ( $template_file ) {
+			include $template_file;
+		}
+		
+		do_action( 'fl_builder_after_render_row', $row, $groups );
 	}
 
 	/**
@@ -1411,17 +1480,28 @@ final class FLBuilder {
 	 */
 	static public function render_row_bg($row)
 	{
+		do_action( 'fl_builder_before_render_row_bg', $row );
+		
 		if($row->settings->bg_type == 'video') {
 
 			$vid_data = FLBuilderModel::get_row_bg_data($row);
 
 			if($vid_data) {
-				include FL_BUILDER_DIR . 'includes/row-video.php';
+				$template_file = self::locate_template_file(
+					apply_filters( 'fl_builder_row_video_bg_template_base', 'row-video', $row ),
+					apply_filters( 'fl_builder_row_video_bg_template_slug', '', $row )
+				);
+				
+				if ( $template_file ) {
+					include $template_file;
+				}
 			}
 		}
 		else if($row->settings->bg_type == 'slideshow') {
 			echo '<div class="fl-bg-slideshow"></div>';
 		}
+		
+		do_action( 'fl_builder_after_render_row_bg', $row );
 	}
 
 	/**
@@ -1483,7 +1563,18 @@ final class FLBuilder {
 	{
 		$cols = FLBuilderModel::get_nodes('column', $group);
 
-		include FL_BUILDER_DIR . 'includes/column-group.php';
+		do_action( 'fl_builder_before_render_column_group', $group, $cols );
+
+		$template_file = self::locate_template_file(
+			apply_filters( 'fl_builder_column_group_template_base', 'column-group', $group ),
+			apply_filters( 'fl_builder_column_group_template_slug', '', $group )
+		);
+		
+		if ( $template_file ) {
+			include $template_file;
+		}
+		
+		do_action( 'fl_builder_after_render_column_group', $group, $cols );
 	}
 
 	/**
@@ -1648,10 +1739,14 @@ final class FLBuilder {
 	static public function render_modules( $col_id = null )
 	{
 		$modules = FLBuilderModel::get_modules( $col_id );
+		
+		do_action( 'fl_builder_before_render_modules', $modules, $col_id );
 
 		foreach ( $modules as $module ) {
 			self::render_module( $module );
 		}
+		
+		do_action( 'fl_builder_after_render_modules', $modules, $col_id );
 	}
 
 	/**
@@ -1666,8 +1761,20 @@ final class FLBuilder {
 		$module 	= is_object( $module_id ) ? $module_id : FLBuilderModel::get_module( $module_id );
 		$settings 	= $module->settings;
 		$id 		= $module->node;
+
+		do_action( 'fl_builder_before_render_module', $module );
+
 		
-		include FL_BUILDER_DIR . 'includes/module.php';
+		$template_file = self::locate_template_file(
+			apply_filters( 'fl_builder_module_template_base', 'module', $module ),
+			apply_filters( 'fl_builder_module_template_slug', '',  $module )
+		);
+		
+		if ( $template_file ) {
+			include $template_file;
+		}
+
+		do_action( 'fl_builder_after_render_module', $module );
 	}
 
 	/**
@@ -2033,7 +2140,25 @@ final class FLBuilder {
 			}
 			
 			file_put_contents($asset_info['css'], $css);
+			
+			do_action( 'fl_builder_after_render_css' );
 		}
+	}
+
+	/**
+	 * Forcing HTTPS in URLs when `FLBuilderModel::is_ssl()` returns TRUE
+	 *
+	 * @since 1.7.6
+	 * @param string $content A string where the URLs will be modified.
+	 * @return string String with SSL ready URLs.
+	 */
+	static public function rewrite_css_cache_urls( $content )
+	{
+		if ( FLBuilderModel::is_ssl() ) {
+			$content = str_ireplace( 'http:', 'https:', $content );
+		}
+		
+		return $content;
 	}
 
 	/**
@@ -2299,6 +2424,8 @@ final class FLBuilder {
 			}
 			
 			file_put_contents($asset_info['js'], $js);
+			
+			do_action( 'fl_builder_after_render_js' );
 		}
 	}
 

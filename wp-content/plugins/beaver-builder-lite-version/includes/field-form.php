@@ -22,9 +22,15 @@
 			}
 		}
 	}
+	
+	// JSON encode the value and fix encoding conflicts.
+	if ( ! empty( $value ) ) {
+		$value = str_replace( "'", '&#39;', json_encode( $value ) );
+		$value = str_replace( '<wbr \/>', '<wbr>', $value );
+	}
 
 	?>
 	</div>
 	<a class="fl-form-field-edit" href="javascript:void(0);" onclick="return false;" data-type="<?php echo $field['form']; ?>"><?php printf( _x( 'Edit %s', '%s stands for form field label.', 'fl-builder' ), $field['label'] ); ?></a>
-	<input name="<?php echo $name; ?>" type="hidden" value='<?php if ( ! empty( $value ) ) echo str_replace( "'", '&#39;', json_encode( $value ) ); ?>' />
+	<input name="<?php echo $name; ?>" type="hidden" value='<?php echo $value; ?>' />
 </div>

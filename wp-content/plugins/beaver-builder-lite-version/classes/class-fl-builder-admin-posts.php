@@ -24,7 +24,7 @@ final class FLBuilderAdminPosts {
 			$screen		= get_current_screen();
 
 			if ( in_array( $screen->post_type, $post_types ) ) {
-				add_filter( 'admin_body_class', 'FLBuilderAdminPosts::body_class' );
+				add_filter( 'admin_body_class', 'FLBuilderAdminPosts::body_class', 99 );
 				add_action( 'admin_enqueue_scripts', 'FLBuilderAdminPosts::styles_scripts' );
 				add_action( 'edit_form_after_title', 'FLBuilderAdminPosts::render' );
 			}

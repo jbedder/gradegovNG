@@ -90,6 +90,15 @@ final class FLBuilderModel {
 	static private $draft_layout_data = array();
 
 	/**
+	 * An array of cached post IDs for node templates.
+	 *
+	 * @since 1.7.6
+	 * @access private
+	 * @var array $node_template_post_ids
+	 */
+	static private $node_template_post_ids = array();
+
+	/**
 	 * Returns a builder edit URL for a post.
 	 *
 	 * @since 1.0 
@@ -1134,6 +1143,7 @@ final class FLBuilderModel {
 			$instance = new $class();
 			$instance->settings = $node->settings;
 			$instance->delete();
+			$instance->remove();
 		}
 	}
 
@@ -1275,7 +1285,7 @@ final class FLBuilderModel {
 
 				$new_nodes[ $col->node ]			= clone $col;
 				$new_nodes[ $col->node ]->settings	= clone $col->settings;
-				$modules							= self::get_modules( $col );
+				$modules							= self::get_nodes( 'module', $col );
 
 				foreach ( $modules as $module ) {
 					$new_nodes[ $module->node ]			   = clone $module;
@@ -2916,6 +2926,9 @@ final class FLBuilderModel {
 	/**
 	 * Ensures the integrity of layout data key/value pairs.
 	 *
+	 * Also makes sure we're not serializing any FLBuilderModule 
+	 * instances because those are too big and bloat the data array.
+	 *
 	 * @since 1.0
 	 * @param array $data An array of layout data.
 	 * @return array
@@ -2925,9 +2938,22 @@ final class FLBuilderModel {
 		$cleaned = array();
 		
 		if ( is_array( $data ) ) {
+			
 			foreach ( $data as $node ) {
-				if ( isset( $node->node ) ) {
-					$cleaned[ $node->node ] = $node;
+				
+				if ( is_object( $node ) && isset( $node->node ) ) {
+					
+					if ( is_a( $node, 'FLBuilderModule' ) ) {
+						$cleaned[ $node->node ]           = new StdClass();
+						$cleaned[ $node->node ]->node     = $node->node;
+						$cleaned[ $node->node ]->type     = $node->type;
+						$cleaned[ $node->node ]->parent   = $node->parent;
+						$cleaned[ $node->node ]->position = $node->position;
+						$cleaned[ $node->node ]->settings = $node->settings;
+					}
+					else {
+						$cleaned[ $node->node ] = $node;
+					}
 				}
 			}
 		}
@@ -3636,18 +3662,26 @@ final class FLBuilderModel {
 	 */
 	static public function get_node_template_post_id( $template_id )
 	{
-		$posts = get_posts( array(
-			'post_type' 		=> 'fl-builder-template',
-			'posts_per_page' 	=> '-1',
-			'meta_key'			=> '_fl_builder_template_id',
-			'meta_value'		=> $template_id
-		) );
-		
-		if ( 0 === count( $posts ) ) {
-			return false;
+		if ( isset( self::$node_template_post_ids[ $template_id ] ) ) {
+			return self::$node_template_post_ids[ $template_id ];
 		}
-		
-		return $posts[ 0 ]->ID;
+		else {
+			
+			$posts = get_posts( array(
+				'post_type' 		=> 'fl-builder-template',
+				'posts_per_page' 	=> '-1',
+				'meta_key'			=> '_fl_builder_template_id',
+				'meta_value'		=> $template_id
+			) );
+			
+			if ( 0 === count( $posts ) ) {
+				return false;
+			}
+			
+			self::$node_template_post_ids[ $template_id ] = $posts[ 0 ]->ID;
+			
+			return $posts[ 0 ]->ID;	
+		}
 	}
 
 	/**
@@ -4381,13 +4415,9 @@ final class FLBuilderModel {
 	 */
 	static public function get_color_presets()
 	{
-		$settings = get_option('_fl_builder_color_presets');
+		$settings = get_option( '_fl_builder_color_presets', array() );
 
-		if(!$settings) {
-			return false;
-		}
-
-		return (array)$settings;
+		return apply_filters( 'fl_builder_color_presets', $settings );
 	}
 
 	/**
@@ -4714,6 +4744,9 @@ final class FLBuilderModel {
 			$filesystem->rmdir( $upload_dir['path'], true );
 
 			// Deactivate and delete the plugin.
+			if (!function_exists('deactivate_plugins')) {
+				require_once(ABSPATH . 'wp-admin/includes/plugin.php');	
+			}
 			deactivate_plugins(array(self::plugin_basename()), false, is_network_admin());
 			delete_plugins(array(self::plugin_basename()));
 

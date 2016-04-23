@@ -3,7 +3,7 @@
  * Plugin Name: Beaver Builder Plugin (Lite Version)
  * Plugin URI: https://www.wpbeaverbuilder.com/?utm_source=external&utm_medium=builder&utm_campaign=plugins-page
  * Description: A drag and drop frontend WordPress page builder plugin that works with almost any theme!
- * Version: 1.7.5
+ * Version: 1.7.8
  * Author: The Beaver Builder Team
  * Author URI: https://www.wpbeaverbuilder.com/?utm_source=external&utm_medium=builder&utm_campaign=plugins-page
  * Copyright: (c) 2014 Beaver Builder
@@ -11,7 +11,7 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: fl-builder
  */
-define('FL_BUILDER_VERSION', '1.7.5');
+define('FL_BUILDER_VERSION', '1.7.8');
 define('FL_BUILDER_FILE', __FILE__);
 define('FL_BUILDER_DIR', plugin_dir_path(FL_BUILDER_FILE));
 define('FL_BUILDER_URL', plugins_url('/', FL_BUILDER_FILE));
@@ -106,3 +106,4 @@ add_filter('mce_buttons_2',                                    'FLBuilder::edito
 add_filter('mce_external_plugins',                             'FLBuilder::editor_external_plugins', 9999);
 add_filter('tiny_mce_before_init',                             'FLBuilder::editor_font_sizes');
 add_filter('the_content',                                      'FLBuilder::render_content');
+add_filter('fl_builder_render_css',                            'FLBuilder::rewrite_css_cache_urls', 9999);

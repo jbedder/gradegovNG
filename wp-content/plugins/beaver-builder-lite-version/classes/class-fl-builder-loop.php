@@ -42,7 +42,7 @@ final class FLBuilderLoop {
 		}
 		
 		// Build the query args.
-		$args = array(
+		$args = apply_filters( 'fl_builder_loop_query_args', array(
 			'paged'					=> $paged,
 			'posts_per_page'		=> $posts_per_page,
 			'post_type'				=> $post_type,
@@ -55,7 +55,7 @@ final class FLBuilderLoop {
 			'fl_original_offset'	=> $offset,
 			'fl_builder_loop'		=> true,
 			'fields'				=> $fields
-		);
+		) );
 		
 		// Build the taxonomy query.
 		$taxonomies = self::taxonomies($post_type);
@@ -195,7 +195,7 @@ final class FLBuilderLoop {
 			$data[$tax_slug] = $tax;
 		}
 		
-		return $data;
+		return apply_filters( 'fl_builder_loop_taxonomies', $data, $taxonomies, $post_type );
 	}
 
 	/**
