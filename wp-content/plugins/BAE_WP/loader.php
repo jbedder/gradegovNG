@@ -12,7 +12,8 @@ class BAE_Base {
 	 BAE_Base function load($id=null, $field=null){
 		 //$field must refer to a primary key.
 		 $this->primary_key=$field;
-		 if(!($query=$db->query("SELECT * FROM ".get_class($this)." Where ".$field."=".$id))){
+		 //can query as an exact match or as a range depending on the input set.
+		 if(!($query=$db->query("SELECT * FROM ".get_class($this)." Where ".count($id==2)?$field." > ".$id[0]. " AND ".$field. "< ".$id[1]:$field."=".$id))){
 			echo "Error creating ".get_class($this).": ".$db->connect_errno;
 		 }
 		 //can handle objects made up of one or more rows of data

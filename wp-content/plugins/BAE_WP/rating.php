@@ -10,23 +10,31 @@ class  rating extends BAE_Base {
 	
 	
 	
-	function __construct::($id=null,$field=null){
+	function __construct::($id=null,$field='id'){
 		parent::__construct($id,$field);	
 	}
 	
-	float function average {
-		if(is_array($this->democraticContribution){
-			return ((array_sum($this->democraticContribution)+array_sum($this->floorContribution)+array_sum($this->generalConduct)+array_sum($this->sponsoredProjects)+
-						array_sum($this->voterEngagement))/5)/count($this->democraticContribution); 
+	
+	float function average($rating=$this) {
+		if(is_array($rating->democraticContribution){
+			return ((array_sum($rating->democraticContribution)+array_sum($rating->floorContribution)+array_sum($rating->generalConduct)+array_sum($rating->sponsoredProjects)+
+					array_sum($rating->voterEngagement))/5)/count($rating->democraticContribution); 
 		}
 		else{
-			return ($this->democraticContribution+$this->floorContribution+$this->generalConduct+$this->sponsoredProjects+
-						$this->voterEngagement)/5; 
+			return ($rating->democraticContribution+$rating->floorContribution+$rating->generalConduct+$rating->sponsoredProjects+
+						$rating->voterEngagement)/5; 
 		}
 	}
 	
-	int function myRating {
+	int function myRating() {
 		return average(new rating($_SESSION['myId'],'userId'));
+	}
+	
+	float function overTime(&$dataPoints,$startDate,$endDate=now()) {
+				$diff=($endDate->format('U')-$startDate->format('U'))/count($dataPoints); //interval to measure for each data point. Assumes we're using dateTime objects.
+				for($i=0;$i<count($dataPoints);$i++) {
+					$dataPoints[$i]=average(new rating(array($startDate+($diff*$i),$startDate+$(diff*($i+1))),"creationDate"));//
+				}
 	}
 	
 	
